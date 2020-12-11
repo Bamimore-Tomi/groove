@@ -8,6 +8,13 @@
         "host":"localhost",
         "port":27017,
         "db_name":"tomsbank"
+    },
+    "messages":{
+       "pickup_options":"Please select on of the following from the menu, let me get some inspirational lines.",
+       "book_options":"Select one of the following category to search for books from, or just reply with the name of the author , or book in the format below \n Author - Dan Brown \n Book - Angels and Demons.",
+       "book_name":"What is the name of the book you are searching for ?\nPlease make sure your response contains only the name of the book.",
+        "book_result_complete":"Book Title : {}\nBook Publisher : {}\nLanguage: {}\nAuthor(s) : {}\n File Detail: {}",
+        "book_result_pdfdrive":"Book Title : {}\nLanguage: {}\n"
     }
 
 }
