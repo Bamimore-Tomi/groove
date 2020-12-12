@@ -1,6 +1,7 @@
 from telegram.ext import Updater
 from telegram.ext import CommandHandler , MessageHandler, Filters , ConversationHandler,CallbackQueryHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
+import telegram 
 
 import os
 import json
@@ -14,7 +15,7 @@ import keyboards
 load_dotenv()
 
 TOKEN = os.getenv('TOKEN')
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.ERROR)
 config = json.load(open("config.json"))
 client = pymongo.MongoClient(os.getenv('DB_URL'))
 db = client[os.getenv('DB_NAME')]
@@ -49,7 +50,8 @@ def ask_book_category(update,context):
     chat_id = update.effective_chat.id
     context.bot.send_message(chat_id=chat_id,
                              text=config['messages']['book_options'],
-                             reply_markup=keyboards.book_category_keyboard())
+                             reply_markup=keyboards.book_category_keyboard(),
+                             parse_mode=telegram.ParseMode.MARKDOWN)
     return ASK_BOOK_CATEGORY
 
 def ask_book_name(update, context):
@@ -58,7 +60,8 @@ def ask_book_name(update, context):
     context.user_data['book_category']=clean_text_reverse(query_data)
     context.bot.send_message(
         chat_id=chat_id,
-        text=config['messages']['book_name']
+        text=config['messages']['book_name'],
+        parse_mode=telegram.ParseMode.MARKDOWN
     )
     return ASK_BOOK_NAME
     
@@ -66,14 +69,28 @@ def send_books(update, context):
     chat_id = update.effective_chat.id
     keyword = ''.join([i for i in update.message.text if i.isalnum() or i==''])
     print(keyword,context.user_data['book_category'])
-    flag, books_ = get_books(category=context.user_data['book_category'], keyword=keyword)
-    if flag==1:
-        for i in range(len(books_)):
-            context.bot.send_photo(
-        chat_id=chat_id,
-        photo = books_[i]['book_image']
-    )
+    status, books_ = get_books(chat_id=chat_id,category=context.user_data['book_category'], keyword=keyword)
+    #book_paginator(update,context,chat_id=chat_id,page=1)
+    thread = threading.Thread(target=book_paginator , args=[update,context],kwargs={'chat_id':chat_id,'page':1})
+    thread.start()
+    context.user_data['last_page']=1
+    #for i in range(int(len(books_)*0.25)):
+    #    context.bot.send_photo(
+    #    chat_id=chat_id,
+    #    photo = books_[i]['book_image']
+    #)
     return -1
+def send_books_from_pagination(update,context):
+    chat_id = update.effective_chat.id 
+    if context.user_data['last_page']<=4:
+        page_to_send=context.user_data['last_page']+1
+        book_paginator(update,context,chat_id=chat_id,page=page_to_send)
+        context.user_data['last_page']=page_to_send
+    else:
+        context.bot.send_message(
+            chat_id=chat_id,
+            text = config['messages']['end_of_book_result']
+        )
 def main():
     updater = Updater(token=TOKEN, use_context=True)
     dispatcher = updater.dispatcher
@@ -96,10 +113,12 @@ def main():
         conversation_timeout = 120,
         fallbacks= [CommandHandler('books',ask_book_category)]
     )
+    more_book_result_command=CommandHandler('more_book_search_result',send_books_from_pagination)
     
     dispatcher.add_handler(entry)
     dispatcher.add_handler(pickup_conv)
     dispatcher.add_handler(book_conv)
+    dispatcher.add_handler(more_book_result_command)
     
     updater.start_polling()
     updater.idle()

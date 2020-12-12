@@ -14,7 +14,7 @@ import time
 from utils import *
 load_dotenv()
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG)
+#logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG)
 client = pymongo.MongoClient(os.getenv('DB_URL'))
 db = client[os.getenv('DB_NAME')]
 
@@ -41,5 +41,7 @@ def book_category_keyboard():
     inline_keyboard_button = [InlineKeyboardButton(i , callback_data=unclean_category[categories.index(i)]) for i in categories]
     inline_keyboard_markup = InlineKeyboardMarkup(build_menu(inline_keyboard_button,2))
     return inline_keyboard_markup
+def jokes_menu():
+    pass
 if __name__=='__main__':
     print(book_category_keyboard())

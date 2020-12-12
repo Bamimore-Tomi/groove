@@ -11,10 +11,11 @@
     },
     "messages":{
        "pickup_options":"Please select on of the following from the menu, let me get some inspirational lines.",
-       "book_options":"Select one of the following category to search for books from, or just reply with the name of the author , or book in the format below \n Author - Dan Brown \n Book - Angels and Demons.",
-       "book_name":"What is the name of the book you are searching for ?\nPlease make sure your response contains only the name of the book.",
-        "book_result_complete":"Book Title : {}\nBook Publisher : {}\nLanguage: {}\nAuthor(s) : {}\n File Detail: {}",
-        "book_result_pdfdrive":"Book Title : {}\nLanguage: {}\n"
+       "book_options":"Select one of the following category to search for books from.",
+       "book_name":"What is the name of the book or author you are searching for ?\n\n**If your search result is not positive, odds are high we don't have data about the book.**",
+        "book_result_complete":"*Book Title* : {}\n*Book Publisher* : {} in {} \n*Number of pages* : {} \n*Language* : {}\n*Author(s)* : {}\n*File Detail* : {}",
+        "book_result_pdfdrive":"*Book Title* : {}\n*Language* : {}",
+        "end_of_book_result":"You have gotten to the end of your book search result.\nHit /books to perform a new search."
     }
 
 }
